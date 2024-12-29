@@ -91,34 +91,6 @@ export const getWeather = async (nx = 60, ny = 127) => {
   }
 };
 
-// 오늘의 시간대 별 날씨 정보
-// export const getHourlyWeather = async (nx = 60, ny = 127) => {
-//   const { baseDate, baseTime } = getBaseDateTime2(); // 기준 날짜와 시간 계산
-//
-//   try {
-//     const forecastWeather = await fetchForecastWeather(baseDate, baseTime, nx, ny);
-//
-//     // 시간대 별 날씨 정보 계산
-//     const hourlyWeather = Object.entries(forecastWeather).map(([time, values]) => {
-//       const timeLabel = `${time.slice(8, 10)}시`;
-//       return {
-//         time: timeLabel,
-//         TMP: parseFloat(values.TMP),
-//         SKY: values.SKY,
-//         PTY: values.PTY
-//       };
-//     });
-//
-//     console.log('######## hourlyWeather1 : ', forecastWeather);
-//     console.log('######## hourlyWeather2 : ', groupForecastByTime(forecastWeather));
-//
-//     return hourlyWeather;
-//   } catch (error) {
-//     console.error('시간대 별 날씨 정보를 가져오는 중 오류 발생:', error);
-//     throw error;
-//   }
-// };
-
 // 기준 날짜와 시간을 계산하는 함수
 const getBaseDateTime = () => {
   const now = new Date();
