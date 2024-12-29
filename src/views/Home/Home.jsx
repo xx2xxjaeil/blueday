@@ -1,21 +1,52 @@
 import React from 'react';
 
 // material-ui
-import { Box, Card, Skeleton, Stack, styled, Typography } from '@mui/material';
+import { Box, ButtonBase, Card, CircularProgress, List, Skeleton, Stack, styled, Typography } from '@mui/material';
 import NearMeIcon from '@mui/icons-material/NearMe';
 import NearMeDisabledIcon from '@mui/icons-material/NearMeDisabled';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 // project imports
 import { userLocation } from '../../context/LocationContext';
 import { latLonToGrid } from '../../utils/LatLonToGrid';
 import { getWeather } from '../../services/WeatherService/Weather';
 import { getCoordinateToAddress } from '../../services/MapService/Map';
+import { WeatherCard } from '../../components';
+import { interpretWeather } from '../../utils/config';
 
 // styles
 const TodayWeatherCard = styled(Card)(({ theme }) => ({
-  width: theme.spacing(45),
+  width: '100%',
   height: theme.spacing(27.5),
   textAlign: 'center',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center'
+}));
+
+const TodayWeatherList = styled(List)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  padding: theme.spacing(1),
+  gap: theme.spacing(1),
+  overflowX: 'scroll'
+}));
+
+const TodayWeatherLoadingBox = styled(Box)(() => ({
+  height: 141,
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center'
+}));
+
+const TodayWeatherErrorBox = styled(Box)(() => ({
+  width: '100%',
+  height: '100%',
+  position: 'absolute',
+  zIndex: 1,
+  opacity: 0.8,
+  borderRadius: '4px',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center'
@@ -26,23 +57,6 @@ const iconStyles = {
   height: 18,
   color: 'gray'
 };
-
-const interpretWeather = (sky, pty) => ({
-  pty:
-    {
-      0: '없음',
-      1: '비',
-      2: '비/눈',
-      3: '눈',
-      4: '소나기'
-    }[pty] || '알 수 없음',
-  sky:
-    {
-      1: '맑음',
-      3: '구름 많음',
-      4: '흐림'
-    }[sky] || '알 수 없음'
-});
 
 const updateState = (setter, data = null, loaded = false, error = false) => {
   setter({ data, loaded, error });
@@ -80,6 +94,7 @@ const Home = () => {
 
   // 날씨 정보 조회
   const fetchWeather = async (nx, ny) => {
+    updateState(setTodayWeather, null, false, false);
     try {
       const todayWeatherResponse = await getWeather(nx, ny);
       updateState(setTodayWeather, todayWeatherResponse, true, false);
@@ -115,17 +130,48 @@ const Home = () => {
     </Stack>
   ) : null;
 
+  // render
   return (
     <Box p={2}>
-      <TodayWeatherCard>
-        <Box>
-          {locationIcon}
-          {locationName}
-          {nowT1H}
-          {maxMinTemp}
-          {nowSky}
-        </Box>
-      </TodayWeatherCard>
+      <Box position="relative">
+        {todayWeather.error && (
+          <TodayWeatherErrorBox>
+            <ButtonBase onClick={() => fetchWeather(location.latitude, location.longitude)}>
+              <Typography variant="h4" fontWeight="bold" mr={1}>
+                재시도
+              </Typography>
+              <RefreshIcon />
+            </ButtonBase>
+          </TodayWeatherErrorBox>
+        )}
+        {/* 오늘 날씨 정보 */}
+        <TodayWeatherCard>
+          <Box>
+            {locationIcon}
+            {locationName}
+            {nowT1H}
+            {maxMinTemp}
+            {nowSky}
+          </Box>
+        </TodayWeatherCard>
+
+        {/* 오늘 시간별 온도 정보 */}
+        <Card sx={{ mt: 2 }}>
+          {!todayWeather.loaded && (
+            <TodayWeatherLoadingBox>
+              <CircularProgress color="gray" />
+            </TodayWeatherLoadingBox>
+          )}
+
+          {todayWeather.loaded && todayWeather.data?.list && (
+            <TodayWeatherList>
+              {Object.entries(todayWeather.data.list).map(([key, weather], index) => (
+                <WeatherCard key={`today-weather-${index}-card`} weather={{ time: key, ...weather }} />
+              ))}
+            </TodayWeatherList>
+          )}
+        </Card>
+      </Box>
     </Box>
   );
 };

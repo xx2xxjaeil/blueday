@@ -69,12 +69,55 @@ export const getWeather = async (nx = 60, ny = 127) => {
     // 오늘 온도(최고/최저/평균) 계산
     const todayTemp = calculateDailyTemperatures(forecastWeather, baseDate);
 
-    return { ...currentWeather, ...todayTemp };
+    const today = new Date();
+    const todayString = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+
+    // 오늘 날짜 데이터 필터링
+    const filteredData = Object.entries(forecastWeather)
+      .filter(([time]) => time.startsWith(todayString))
+      .reduce((acc, [time, data]) => {
+        acc[time] = data;
+        return acc;
+      }, {});
+
+    return {
+      ...currentWeather,
+      ...todayTemp,
+      list: filteredData
+    };
   } catch (error) {
     console.error('날씨 정보를 가져오는 중 오류 발생:', error);
     throw error;
   }
 };
+
+// 오늘의 시간대 별 날씨 정보
+// export const getHourlyWeather = async (nx = 60, ny = 127) => {
+//   const { baseDate, baseTime } = getBaseDateTime2(); // 기준 날짜와 시간 계산
+//
+//   try {
+//     const forecastWeather = await fetchForecastWeather(baseDate, baseTime, nx, ny);
+//
+//     // 시간대 별 날씨 정보 계산
+//     const hourlyWeather = Object.entries(forecastWeather).map(([time, values]) => {
+//       const timeLabel = `${time.slice(8, 10)}시`;
+//       return {
+//         time: timeLabel,
+//         TMP: parseFloat(values.TMP),
+//         SKY: values.SKY,
+//         PTY: values.PTY
+//       };
+//     });
+//
+//     console.log('######## hourlyWeather1 : ', forecastWeather);
+//     console.log('######## hourlyWeather2 : ', groupForecastByTime(forecastWeather));
+//
+//     return hourlyWeather;
+//   } catch (error) {
+//     console.error('시간대 별 날씨 정보를 가져오는 중 오류 발생:', error);
+//     throw error;
+//   }
+// };
 
 // 기준 날짜와 시간을 계산하는 함수
 const getBaseDateTime = () => {
@@ -89,6 +132,26 @@ const getBaseDateTime = () => {
     baseTime = `${String(hours).padStart(2, '0')}30`;
   } else {
     baseTime = `${String(hours - 1).padStart(2, '0')}30`;
+  }
+
+  return { baseDate: date, baseTime };
+};
+
+// 현재 시간에 가까운 기준 날짜와 시간을 계산하는 함수
+const getBaseDateTime2 = () => {
+  const now = new Date();
+  const date = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+  const hours = now.getHours();
+
+  // 기준 시간은 3시간 간격 (0200, 0500, 0800 등)
+  const baseTimes = ['0200', '0500', '0800', '1100', '1400', '1700', '2000', '2300'];
+  const baseTime = baseTimes.reduce((prev, curr) => (hours >= parseInt(curr.substring(0, 2)) ? curr : prev), baseTimes[0]);
+
+  // 자정 이후 시간 요청일 경우, 이전 날짜로 처리
+  if (hours < 2) {
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const yesterdayDate = `${yesterday.getFullYear()}${String(yesterday.getMonth() + 1).padStart(2, '0')}${String(yesterday.getDate()).padStart(2, '0')}`;
+    return { baseDate: yesterdayDate, baseTime };
   }
 
   return { baseDate: date, baseTime };
