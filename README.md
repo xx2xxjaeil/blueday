@@ -4,6 +4,10 @@
 
 ---
 
+hosting url: https://blue-day-187fb.web.app/home
+
+---
+
 ## 주요 기능
 
 ### 1. **현재 위치 기반 날씨 조회**
