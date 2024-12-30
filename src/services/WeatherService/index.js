@@ -1,4 +1,4 @@
-const BASE_URL = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0';
+const BASE_URL = '/api/1360000/VilageFcstInfoService_2.0';
 
 export const WEATHER_FUNCTION_URL = {
   /** 초단기실황조회 API */

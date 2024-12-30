@@ -1,8 +1,41 @@
-# React + Vite
+# Weather App Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+이 프로젝트는 위치 기반으로 기상 정보를 보여주는 날씨 애플리케이션입니다. 사용자는 현재 위치의 날씨 정보를 확인하거나 검색 기능을 통해 특정 지역의 날씨를 조회할 수 있습니다. 즐겨찾기 기능을 통해 자주 확인하는 지역을 저장하고 쉽게 접근할 수 있습니다.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 주요 기능
+
+### 1. **현재 위치 기반 날씨 조회**
+- 사용자의 브라우저 위치 권한을 요청하여 현재 위치의 날씨를 표시합니다.
+- 온도, 강수 확률, 하늘 상태, 풍속 등의 정보를 제공합니다.
+
+### 2. **시간별 날씨 정보**
+- 시간대별 기온과 날씨를 카드 형태로 표시합니다.
+- 스크롤을 통해 원하는 시간대의 날씨를 확인할 수 있습니다.
+
+### 3. **지역 검색 기능**
+- 지역 이름을 입력하여 원하는 지역의 날씨를 검색할 수 있습니다.
+- 검색된 결과는 카드 형태로 표시되며, 선택한 지역의 날씨를 확인할 수 있습니다.
+
+### 4. **즐겨찾기 기능**
+- 검색한 지역을 즐겨찾기에 추가하거나 삭제할 수 있습니다.
+- 즐겨찾기된 지역은 로컬스토리지(LocalStorage)에 저장되어 새로고침해도 유지됩니다.
+
+### 5. **CORS 문제 해결을 위한 Firebase Functions Proxy**
+- 기상청 API 호출 시 발생하는 CORS 문제를 해결하기 위해 Firebase Functions를 활용한 프록시 서버를 구성했습니다.
+
+---
+
+## 사용 기술
+
+### 1. **프론트엔드**
+- **React.js**: UI 구성 및 상태 관리
+- **Material-UI (MUI)**: 사용자 친화적인 디자인 컴포넌트
+- **Axios**: API 호출 라이브러리
+- **Moment.js**: 날짜 및 시간 형식화
+
+### 2. **백엔드**
+- **Firebase Hosting**: 정적 파일 배포
+- **Firebase Functions**: CORS 문제 해결을 위한 프록시 서버
+- **Node.js**: Firebase Functions 환경
